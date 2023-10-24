@@ -89,6 +89,18 @@ app.get('/delete-task/:taskId', (req, res) => {
 	})
 })
 
+app.post('/clear-all', (req, res) => {
+  // Teeb tasks.json tühjaks
+  const emptyTasks = [];
+  const data = JSON.stringify(emptyTasks, null, 2);
+  writeFile('tasks.json', data)
+    .then(() => {
+      res.redirect('/');
+    });
+});
+
+
+
 app.listen(3001, () => {
 	console.log('Example app is started at http://localhost:3001')
 })
