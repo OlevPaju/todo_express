@@ -114,6 +114,59 @@ app.post('/clear-all', (req, res) => {
     });
 });
 
+app.get('/update-task/:taskId', (req, res) => {
+    const taskId = parseInt(req.params.taskId);
+
+    readFile('./tasks.json')
+        .then(tasks => {
+            const taskToEdit = tasks.find(task => task.id === taskId);
+
+            res.render('edit', {
+                task: taskToEdit,
+                error: null 
+            });
+        })
+});
+
+
+app.post('/update-task', (req, res) => {
+    const updatedTask = {
+        id: parseInt(req.body.taskId),
+        task: req.body.task
+    };
+
+    // Validation for an empty task
+    if (updatedTask.task.trim() === '') {
+        readFile('./tasks.json')
+            .then(tasks => {
+                const taskToUpdate = tasks.find(task => task.id === updatedTask.id);
+
+                res.render('edit', {
+                    task: taskToUpdate,
+                    error: 'Please insert correct task data'
+                });
+            })
+    } else {
+        readFile('./tasks.json')
+            .then(tasks => {
+                const taskToUpdate = tasks.find(task => task.id === updatedTask.id);
+
+                if (taskToUpdate) {
+                    taskToUpdate.task = updatedTask.task;
+
+                    const data = JSON.stringify(tasks, null, 2);
+                    writeFile('tasks.json', data)
+                        .then(() => {
+                            res.redirect('/');
+                        })
+                } else {
+                    res.redirect('/');
+                }
+            })
+    }
+});
+
+
 
 
 app.listen(3001, () => {
